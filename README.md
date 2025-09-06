@@ -79,12 +79,15 @@ Acceder a la web:
 - Crear usuario (registro).
 - Iniciar sesión con email y contraseña (encriptada).
 - Validación de credenciales.
+- Crear un evento
+- Modificar un evento
+- Visualizar la informacion del evento
+- Eliminar un evento en especifico
 
 ---
 
 ## 📌 Próximos pasos
 
-- CRUD de eventos.
 - Ventas y devoluciones de entradas.
 - Reportes automáticos.
 - Filtrado y búsqueda de eventos.
