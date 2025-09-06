@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Detalle del Evento</h2>
+<ul class="list-group">
+    <li class="list-group-item"><b>Nombre:</b> {{ evento.name }}</li>
+    <li class="list-group-item"><b>Descripción:</b> {{ evento.description }}</li>
+    <li class="list-group-item"><b>Fecha:</b> {{ evento.date }}</li>
+    <li class="list-group-item"><b>Categoría:</b> {{ evento.category_name }}</li>
+    <li class="list-group-item"><b>Precio:</b> {{ evento.price }}</li>
+    <li class="list-group-item"><b>Cupos disponibles:</b> {{ evento.current_quota }}</li>
+    <li class="list-group-item"><b>Creado por:</b> {{ evento.creator_name }}</li>
+</ul>
+{% if evento.created_by == user_id %}
+<a href="{{ url_for('editar_evento', event_id=evento.id) }}" class="btn btn-warning mt-3">Editar</a>
+<form action="{{ url_for('eliminar_evento', event_id=evento.id) }}" method="post" style="display:inline;">
+    <button type="submit" class="btn btn-danger mt-3">Eliminar</button>
+</form>
+{% endif %}
+<a href="/" class="btn btn-secondary mt-3">Volver</a>
+{% endblock %}
