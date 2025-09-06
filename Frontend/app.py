@@ -62,7 +62,44 @@ def evento_detalle(event_id):
         flash('Evento no encontrado', 'danger')
         return redirect(url_for('eventos'))
     evento = r.json()
-    return render_template('evento_detalle.html', evento=evento, user_id=session['user_id'])
+    # Obtener entradas por usuario para este evento
+    r2 = requests.get(f'{API_URL}/eventos/{event_id}/entradas_usuarios')
+    entradas_usuarios = r2.json() if r2.status_code == 200 else []
+    # Buscar cuántas entradas tiene el usuario actual
+    user_id = session['user_id']
+    entradas_usuario = 0
+    for eu in entradas_usuarios:
+        if eu['user_id'] == user_id:
+            entradas_usuario = eu['entradas']
+            break
+    return render_template('evento_detalle.html', evento=evento, user_id=user_id, entradas_usuarios=entradas_usuarios, entradas_usuario=entradas_usuario)
+
+# --- Gestión de entradas ---
+@app.post('/evento/<int:event_id>/venta')
+def venta_entrada(event_id):
+    if 'user_id' not in session:
+        return redirect(url_for("login"))
+    cantidad = int(request.form.get('cantidad', 1))
+    user_id = session['user_id']
+    r = requests.post(f'{API_URL}/eventos/{event_id}/venta', json={"user_id": user_id, "cantidad": cantidad})
+    if r.status_code == 200:
+        flash('Venta registrada', 'success')
+    else:
+        flash(r.json().get('detail', 'No se pudo registrar la venta'), 'danger')
+    return redirect(url_for('evento_detalle', event_id=event_id))
+
+@app.post('/evento/<int:event_id>/devolucion')
+def devolucion_entrada(event_id):
+    if 'user_id' not in session:
+        return redirect(url_for("login"))
+    user_id = session['user_id']
+    cantidad = int(request.form.get('cantidad', 1))
+    r = requests.post(f'{API_URL}/eventos/{event_id}/devolucion', json={"user_id": user_id, "cantidad": cantidad})
+    if r.status_code == 200:
+        flash('Devolución registrada', 'success')
+    else:
+        flash(r.json().get('detail', 'No se pudo registrar la devolución'), 'danger')
+    return redirect(url_for('evento_detalle', event_id=event_id))
 
 @app.route('/crear', methods=['GET', 'POST'])
 def crear_evento():
