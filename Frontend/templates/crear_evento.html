@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Crear Evento</h2>
+<form method="post">
+    <div class="mb-3">
+        <label>Nombre</label>
+        <input type="text" name="name" class="form-control" maxlength="100" required>
+    </div>
+    <div class="mb-3">
+        <label>Descripción</label>
+        <textarea name="description" class="form-control" required></textarea>
+    </div>
+    <div class="mb-3">
+        <label>Fecha</label>
+        <input type="date" name="fecha" class="form-control" required>
+    </div>
+    <div class="mb-3">
+        <label>Categoría</label>
+        <select name="categoria" class="form-control" required>
+            <option value="Charla">Charla</option>
+            <option value="Taller">Taller</option>
+            <option value="Show">Show</option>
+        </select>
+    </div>
+    <div class="mb-3">
+        <label>Precio</label>
+        <input type="number" name="precio" class="form-control" min="0" required>
+    </div>
+    <div class="mb-3">
+        <label>Cupos disponibles</label>
+        <input type="number" name="cupos" class="form-control" min="0" required>
+    </div>
+    <input type="hidden" name="user_id" value="1">
+    <button type="submit" class="btn btn-success">Crear</button>
+    <a href="/" class="btn btn-secondary">Cancelar</a>
+</form>
+{% endblock %}

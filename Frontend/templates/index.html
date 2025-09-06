@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Eventos</h1>
+<a href="{{ url_for('crear_evento') }}" class="btn btn-primary mb-3">Crear Evento</a>
+<table class="table table-bordered">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Fecha</th>
+            <th>Categoría</th>
+            <th>Precio</th>
+            <th>Cupos</th>
+            <th>Creador</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for evento in eventos %}
+        <tr>
+            <td>{{ evento.name }}</td>
+            <td>{{ evento.date }}</td>
+            <td>{{ evento.category_name }}</td>
+            <td>{{ evento.price }}</td>
+            <td>{{ evento.current_quota }}</td>
+            <td>{{ evento.creator_name }}</td>
+            <td>
+                <a href="{{ url_for('evento_detalle', event_id=evento.id) }}" class="btn btn-info btn-sm">Ver</a>
+                {% if evento.created_by == user_id %}
+                <a href="{{ url_for('editar_evento', event_id=evento.id) }}" class="btn btn-warning btn-sm">Editar</a>
+                <form action="{{ url_for('eliminar_evento', event_id=evento.id) }}" method="post" style="display:inline;">
+                    <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                </form>
+                {% endif %}
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
