@@ -62,11 +62,13 @@ def get_event(event_id: int) -> Optional[dict]:
 def update_event(event_id: int, name: str, description: str, fecha: str, categoria: str, precio: int, cupos: int, user_id: int) -> bool:
     conn = get_db_connection()
     cur = conn.cursor()
-    cur.execute('SELECT created_by FROM events WHERE id = ?', (event_id,))
+    cur.execute('SELECT created_by, initial_quota, current_quota FROM events WHERE id = ?', (event_id,))
     row = cur.fetchone()
     if not row or row['created_by'] != user_id:
         conn.close()
         return False
+    initial_quota_old = row['initial_quota']
+    current_quota_old = row['current_quota']
     try:
         event_date = date.fromisoformat(fecha)
         if event_date < date.today():
@@ -82,8 +84,13 @@ def update_event(event_id: int, name: str, description: str, fecha: str, categor
     if not category_id:
         conn.close()
         return False
+    # Solo aumentar initial_quota si cupos es mayor al valor anterior
+    new_initial_quota = max(initial_quota_old, cupos)
+    # Si el cupo aumenta, aumentar current_quota en la misma diferencia
+    diff = new_initial_quota - initial_quota_old
+    new_current_quota = current_quota_old + diff if diff > 0 else current_quota_old
     cur.execute('''UPDATE events SET name=?, description=?, date=?, category_id=?, price=?, initial_quota=?, current_quota=?, updated_at=datetime('now') WHERE id=?''',
-                (name, description, fecha, category_id, precio, cupos, cupos, event_id))
+                (name, description, fecha, category_id, precio, new_initial_quota, new_current_quota, event_id))
     conn.commit()
     conn.close()
     return True

@@ -8,7 +8,7 @@
     <li class="list-group-item"><b>Fecha:</b> {{ evento.fecha or evento.date }}</li>
     <li class="list-group-item"><b>Categoría:</b> {{ evento.categoria or evento.category_name }}</li>
     <li class="list-group-item"><b>Precio:</b> {{ evento.precio or evento.price }}</li>
-    <li class="list-group-item"><b>Cupos disponibles:</b> {{ evento.cupos or evento.current_quota or evento.cupos_actuales }}</li>
+    <li class="list-group-item"><b>Cupos disponibles:</b> {{ evento.cupos or evento.current_quota or evento.cupos_actuales or 0}}</li>
 </ul>
 {% if evento.created_by == user_id %}
 <a href="{{ url_for('editar_evento', event_id=evento.id) }}" class="btn btn-warning mt-3">Editar</a>

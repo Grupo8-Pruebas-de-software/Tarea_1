@@ -12,11 +12,13 @@ def get_evento(evento_id):
     return evento
 
 def registrar_venta(evento_id, user_id, cantidad=1):
+    if cantidad <= 0:
+        raise HTTPException(status_code=400, detail="La cantidad debe ser mayor a 0")
     evento = get_evento(evento_id)
     if not evento:
         raise HTTPException(status_code=404, detail="Evento no encontrado")
     id, current_quota, _ = evento
-    if current_quota < cantidad:
+    if cantidad > current_quota:
         raise HTTPException(status_code=400, detail="No hay suficientes cupos disponibles para este evento")
     conn = sqlite3.connect('../microevents.db')
     cursor = conn.cursor()
@@ -29,6 +31,8 @@ def registrar_venta(evento_id, user_id, cantidad=1):
     return {"mensaje": "Venta registrada", "current_quota": current_quota - cantidad}
 
 def registrar_devolucion(evento_id, user_id, cantidad=1):
+    if cantidad <= 0:
+        raise HTTPException(status_code=400, detail="La cantidad debe ser mayor a 0")
     evento = get_evento(evento_id)
     if not evento:
         raise HTTPException(status_code=404, detail="Evento no encontrado")
@@ -38,7 +42,7 @@ def registrar_devolucion(evento_id, user_id, cantidad=1):
     cursor = conn.cursor()
     cursor.execute("SELECT COALESCE(SUM(CASE WHEN type='SALE' THEN quantity WHEN type='REFUND' THEN -quantity ELSE 0 END),0) FROM ticket_movements WHERE event_id=? AND performed_by=?", (evento_id, user_id))
     entradas_usuario = cursor.fetchone()[0]
-    if entradas_usuario < cantidad:
+    if cantidad > entradas_usuario:
         conn.close()
         raise HTTPException(status_code=400, detail="No tienes suficientes entradas para devolver")
     if current_quota + cantidad > initial_quota:
