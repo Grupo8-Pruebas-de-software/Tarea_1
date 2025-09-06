@@ -64,6 +64,33 @@ def evento_detalle(event_id):
     evento = r.json()
     return render_template('evento_detalle.html', evento=evento, user_id=session['user_id'])
 
+# --- Gestión de entradas ---
+@app.post('/evento/<int:event_id>/venta')
+def venta_entrada(event_id):
+    if 'user_id' not in session:
+        return redirect(url_for("login"))
+    cantidad = int(request.form.get('cantidad', 1))
+    for _ in range(cantidad):
+        r = requests.post(f'{API_URL}/eventos/{event_id}/venta')
+        if r.status_code != 200:
+            flash(r.json().get('detail', 'No se pudo registrar la venta'), 'danger')
+            break
+    else:
+        flash('Venta registrada', 'success')
+    return redirect(url_for('evento_detalle', event_id=event_id))
+
+@app.post('/evento/<int:event_id>/devolucion')
+def devolucion_entrada(event_id):
+    if 'user_id' not in session:
+        return redirect(url_for("login"))
+    # Aquí deberías validar que el usuario tiene entradas, pero para demo solo permite una devolución por vez
+    r = requests.post(f'{API_URL}/eventos/{event_id}/devolucion')
+    if r.status_code == 200:
+        flash('Devolución registrada', 'success')
+    else:
+        flash(r.json().get('detail', 'No se pudo registrar la devolución'), 'danger')
+    return redirect(url_for('evento_detalle', event_id=event_id))
+
 @app.route('/crear', methods=['GET', 'POST'])
 def crear_evento():
     if 'user_id' not in session:

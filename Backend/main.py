@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import auth
 import eventos
+import entradas
 from typing import List
 from datetime import date
 
@@ -88,3 +89,15 @@ def login(user: UserLogin):
     if not uid:
         raise HTTPException(status_code=401, detail="Invalid credentials")
     return {"message": "Login successful", "user_id": uid}
+
+
+# Gestión de entradas: venta y devolución
+@app.post("/eventos/{event_id}/venta", response_model=dict)
+def registrar_venta(event_id: int):
+    """Registra una venta de entrada para el evento (resta 1 cupo)."""
+    return entradas.registrar_venta(event_id)
+
+@app.post("/eventos/{event_id}/devolucion", response_model=dict)
+def registrar_devolucion(event_id: int):
+    """Registra una devolución de entrada para el evento (suma 1 cupo)."""
+    return entradas.registrar_devolucion(event_id)

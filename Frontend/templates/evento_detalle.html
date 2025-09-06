@@ -4,12 +4,22 @@
 <ul class="list-group">
     <li class="list-group-item"><b>Nombre:</b> {{ evento.name }}</li>
     <li class="list-group-item"><b>Descripción:</b> {{ evento.description }}</li>
-    <li class="list-group-item"><b>Fecha:</b> {{ evento.date }}</li>
-    <li class="list-group-item"><b>Categoría:</b> {{ evento.category_name }}</li>
-    <li class="list-group-item"><b>Precio:</b> {{ evento.price }}</li>
-    <li class="list-group-item"><b>Cupos disponibles:</b> {{ evento.current_quota }}</li>
-    <li class="list-group-item"><b>Creado por:</b> {{ evento.creator_name }}</li>
+    <li class="list-group-item"><b>Creador:</b> {{ evento.creator_name }}</li>
+    <li class="list-group-item"><b>Fecha:</b> {{ evento.fecha or evento.date }}</li>
+    <li class="list-group-item"><b>Categoría:</b> {{ evento.categoria or evento.category_name }}</li>
+    <li class="list-group-item"><b>Precio:</b> {{ evento.precio or evento.price }}</li>
+    <li class="list-group-item"><b>Cupos disponibles:</b> {{ evento.cupos or evento.current_quota or evento.cupos_actuales }}</li>
 </ul>
+<form action="{{ url_for('venta_entrada', event_id=evento.id, user_id=session['user_id']) }}" method="post" style="display:inline;">
+    <label for="cantidad">Cantidad a comprar:</label>
+    <input type="number" name="cantidad" id="cantidad" min="1" max="{{ evento.cupos or evento.current_quota or evento.cupos_actuales }}" value="1" required style="width:70px;">
+    <button type="submit" class="btn btn-success mt-3">Comprar</button>
+</form>
+{% if evento.entradas_usuario and evento.entradas_usuario > 0 %}
+<form action="{{ url_for('devolucion_entrada', event_id=evento.id, user_id=session['user_id']) }}" method="post" style="display:inline;">
+    <button type="submit" class="btn btn-info mt-3">Devolver entrada</button>
+</form>
+{% endif %}
 {% if evento.created_by == user_id %}
 <a href="{{ url_for('editar_evento', event_id=evento.id) }}" class="btn btn-warning mt-3">Editar</a>
 <form action="{{ url_for('eliminar_evento', event_id=evento.id) }}" method="post" style="display:inline;">
