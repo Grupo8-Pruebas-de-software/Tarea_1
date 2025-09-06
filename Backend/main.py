@@ -1,4 +1,5 @@
-from fastapi import FastAPI, HTTPException
+
+from fastapi import FastAPI, HTTPException, Request, Body
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import auth
@@ -6,6 +7,7 @@ import eventos
 import entradas
 from typing import List
 from datetime import date
+
 
 app = FastAPI()
 
@@ -92,12 +94,33 @@ def login(user: UserLogin):
 
 
 # Gestión de entradas: venta y devolución
+
+
 @app.post("/eventos/{event_id}/venta", response_model=dict)
-def registrar_venta(event_id: int):
-    """Registra una venta de entrada para el evento (resta 1 cupo)."""
-    return entradas.registrar_venta(event_id)
+def registrar_venta(event_id: int, request: Request, user_id: int = Body(...), cantidad: int = Body(1)):
+    """Registra una venta de entrada para el evento (resta n cupos)."""
+    return entradas.registrar_venta(event_id, user_id, cantidad)
 
 @app.post("/eventos/{event_id}/devolucion", response_model=dict)
-def registrar_devolucion(event_id: int):
-    """Registra una devolución de entrada para el evento (suma 1 cupo)."""
-    return entradas.registrar_devolucion(event_id)
+def registrar_devolucion(event_id: int, request: Request, user_id: int = Body(...), cantidad: int = Body(1)):
+    """Registra una devolución de entrada para el evento (suma n cupos)."""
+    return entradas.registrar_devolucion(event_id, user_id, cantidad)
+
+@app.get("/eventos/{event_id}/entradas_usuarios", response_model=list)
+def entradas_por_usuario(event_id: int):
+    """Devuelve una lista de usuarios y la cantidad de entradas que tiene cada uno para el evento."""
+    conn = entradas.sqlite3.connect('../microevents.db')
+    cursor = conn.cursor()
+    cursor.execute('''
+        SELECT u.id, u.name, u.email, COALESCE(SUM(CASE WHEN tm.type='SALE' THEN tm.quantity WHEN tm.type='REFUND' THEN -tm.quantity ELSE 0 END),0) as entradas
+        FROM users u
+        LEFT JOIN ticket_movements tm ON tm.performed_by = u.id AND tm.event_id = ?
+        GROUP BY u.id
+        HAVING entradas > 0
+        ORDER BY entradas DESC
+    ''', (event_id,))
+    data = [
+        {"user_id": row[0], "name": row[1], "email": row[2], "entradas": row[3]} for row in cursor.fetchall()
+    ]
+    conn.close()
+    return data

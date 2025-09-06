@@ -10,16 +10,6 @@
     <li class="list-group-item"><b>Precio:</b> {{ evento.precio or evento.price }}</li>
     <li class="list-group-item"><b>Cupos disponibles:</b> {{ evento.cupos or evento.current_quota or evento.cupos_actuales }}</li>
 </ul>
-<form action="{{ url_for('venta_entrada', event_id=evento.id, user_id=session['user_id']) }}" method="post" style="display:inline;">
-    <label for="cantidad">Cantidad a comprar:</label>
-    <input type="number" name="cantidad" id="cantidad" min="1" max="{{ evento.cupos or evento.current_quota or evento.cupos_actuales }}" value="1" required style="width:70px;">
-    <button type="submit" class="btn btn-success mt-3">Comprar</button>
-</form>
-{% if evento.entradas_usuario and evento.entradas_usuario > 0 %}
-<form action="{{ url_for('devolucion_entrada', event_id=evento.id, user_id=session['user_id']) }}" method="post" style="display:inline;">
-    <button type="submit" class="btn btn-info mt-3">Devolver entrada</button>
-</form>
-{% endif %}
 {% if evento.created_by == user_id %}
 <a href="{{ url_for('editar_evento', event_id=evento.id) }}" class="btn btn-warning mt-3">Editar</a>
 <form action="{{ url_for('eliminar_evento', event_id=evento.id) }}" method="post" style="display:inline;">
@@ -27,4 +17,40 @@
 </form>
 {% endif %}
 <a href="/" class="btn btn-secondary mt-3">Volver</a>
+
+
+<p class="mt-3"><b>Tus entradas para este evento:</b> {{ entradas_usuario }}</p>
+<form action="{{ url_for('venta_entrada', event_id=evento.id, user_id=session['user_id']) }}" method="post" style="display:inline;">
+    <label for="cantidad">Cantidad a comprar:</label>
+    <input type="number" name="cantidad" id="cantidad" min="1" max="{{ evento.cupos or evento.current_quota or evento.cupos_actuales }}" value="1" required style="width:70px;">
+    <button type="submit" class="btn btn-success mt-3">Comprar</button>
+</form>
+
+<p> </p>
+
+{% if entradas_usuario > 0 %}
+<form action="{{ url_for('devolucion_entrada', event_id=evento.id, user_id=user_id) }}" method="post" style="display:inline;">
+    <label for="cantidad_devolver">Cantidad a devolver:</label>
+    <input type="number" name="cantidad" id="cantidad_devolver" min="1" max="{{ entradas_usuario }}" value="1" required style="width:70px;">
+    <button type="submit" class="btn btn-info mt-3">Devolver</button>
+</form>
+{% endif %}
+
+{% if evento.created_by == user_id and entradas_usuarios %}
+<h4 class="mt-4">Entradas por usuario</h4>
+<table class="table table-bordered">
+    <thead>
+        <tr><th>Usuario</th><th>Email</th><th>Cantidad de entradas</th></tr>
+    </thead>
+    <tbody>
+        {% for eu in entradas_usuarios %}
+        <tr>
+            <td>{{ eu.name }}</td>
+            <td>{{ eu.email }}</td>
+            <td>{{ eu.entradas }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endif %}
 {% endblock %}
