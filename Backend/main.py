@@ -8,6 +8,7 @@ import entradas
 from typing import List
 from logger_config import logger
 from typing import Optional, List
+from datetime import date
 
 
 
