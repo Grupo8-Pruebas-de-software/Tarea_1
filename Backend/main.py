@@ -1,4 +1,5 @@
-from fastapi import FastAPI, HTTPException, Request, Body
+
+from fastapi import FastAPI, HTTPException, Request, Body, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import auth
@@ -6,6 +7,9 @@ import eventos
 import entradas
 from typing import List
 from logger_config import logger
+from typing import Optional, List
+from datetime import date
+
 
 
 app = FastAPI()
@@ -60,8 +64,13 @@ def create_event(event: EventCreate):
     return {"message": "Evento creado", "event_id": event_id}
 
 @app.get("/eventos", response_model=List[dict])
-def list_events():
-    return eventos.get_events()
+def list_events(
+    categoria: Optional[str] = Query(None, description="Nombre exacto de la categoría"),
+    dias: Optional[int] = Query(None, ge=1, le=365, description="Próximos N días"),
+    estado: Optional[str] = Query(None, pattern="^(disponible|agotado)$", description="Estado"),
+    q: Optional[str] = Query(None, description="Búsqueda por nombre/descr.")
+):
+    return eventos.get_events_filtered(categoria=categoria, dias=dias, estado=estado, q=q)
 
 @app.get("/eventos/{event_id}", response_model=dict)
 def get_event(event_id: int):
