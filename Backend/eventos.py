@@ -1,5 +1,6 @@
 from datetime import date, timedelta
 from typing import List, Optional
+from logger_config import logger
 import sqlite3
 
 def get_db_connection():
@@ -34,6 +35,7 @@ def create_event(name: str, description: str, fecha: str, categoria: str, precio
     conn.commit()
     event_id = cur.lastrowid
     conn.close()
+    logger.info(f"Evento creado: id={event_id}, nombre='{name}', user_id={user_id}")
     return event_id
 
 def get_events() -> List[dict]:
