@@ -1,4 +1,5 @@
 import sqlite3, hashlib, os
+from logger_config import logger
 
 DB_PATH = os.path.join(os.path.dirname(__file__), "..", "microevents.db")
 DB_PATH = os.path.abspath(DB_PATH)
@@ -19,8 +20,10 @@ def create_user(name: str, email: str, password: str):
                 (name, email, salt, hashed, "admin"),
             )
             con.commit()
+            logger.info(f"Usuario creado: {email}")
             return True
         except sqlite3.IntegrityError:
+            logger.warning(f"Intento de crear usuario con email ya registrado: {email}")
             return False
 
 def verify_user(email: str, password: str):
@@ -29,7 +32,13 @@ def verify_user(email: str, password: str):
         cur.execute("SELECT id, password_salt, password_hash FROM users WHERE email = ?", (email,))
         row = cur.fetchone()
         if not row:
+            logger.warning(f"Intento de login fallido (usuario no existe): {email}")
             return None
         uid, salt, stored_hash = row
         _, hashed = hash_password(password, salt)
-        return uid if hashed == stored_hash else None
+        if hashed == stored_hash:
+            logger.info(f"Login exitoso: {email}")
+            return uid
+        else:
+            logger.warning(f"Intento de login fallido (password incorrecta): {email}")
+            return None
