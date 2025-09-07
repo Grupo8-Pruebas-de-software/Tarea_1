@@ -3,6 +3,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash, ses
 import sys, os, requests
 sys.path.append(os.path.abspath("../Backend"))  # Para importar auth.py
 import auth
+import eventos
 
 
 app = Flask(__name__)
@@ -13,7 +14,7 @@ API_URL = 'http://localhost:8000'
 def home():
     if 'user_id' not in session:
         return redirect(url_for("login"))
-    return redirect(url_for("eventos"))
+    return redirect(url_for("eventos_index"))
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -46,12 +47,17 @@ def register():
 
 # CRUD EVENTOS
 @app.route("/eventos")
-def eventos():
-    if 'user_id' not in session:
-        return redirect(url_for("login"))
-    r = requests.get(f'{API_URL}/eventos')
-    eventos = r.json() if r.status_code == 200 else []
-    return render_template('index.html', eventos=eventos, user_id=session['user_id'])
+def eventos_index():
+    categoria = request.args.get("categoria") or None
+    dias = request.args.get("dias")
+    dias = int(dias) if dias and dias.isdigit() else None
+    estado = request.args.get("estado") or None
+    q = request.args.get("q") or None
+
+    items = eventos.get_events_filtered(categoria=categoria, dias=dias, estado=estado, q=q)
+    categorias = eventos.get_categories()
+    # user_id: colócalo desde tu sesión/login
+    return render_template("eventos.html", eventos=items, categorias=categorias, user_id=1)
 
 @app.route('/evento/<int:event_id>')
 def evento_detalle(event_id):
@@ -60,7 +66,7 @@ def evento_detalle(event_id):
     r = requests.get(f'{API_URL}/eventos/{event_id}')
     if r.status_code != 200:
         flash('Evento no encontrado', 'danger')
-        return redirect(url_for('eventos'))
+        return redirect(url_for('eventos_index'))
     evento = r.json()
     # Obtener entradas por usuario para este evento
     r2 = requests.get(f'{API_URL}/eventos/{event_id}/entradas_usuarios')
@@ -118,7 +124,7 @@ def crear_evento():
         r = requests.post(f'{API_URL}/eventos', json=data)
         if r.status_code == 200:
             flash('Evento creado correctamente', 'success')
-            return redirect(url_for('eventos'))
+            return redirect(url_for('eventos_index'))
         else:
             flash(r.json().get('detail', 'Error al crear evento'), 'danger')
     return render_template('crear_evento.html', user_id=session['user_id'])
@@ -130,7 +136,7 @@ def editar_evento(event_id):
     r = requests.get(f'{API_URL}/eventos/{event_id}')
     if r.status_code != 200:
         flash('Evento no encontrado', 'danger')
-        return redirect(url_for('eventos'))
+        return redirect(url_for('eventos_index'))
     evento = r.json()
     if request.method == 'POST':
         data = {
@@ -160,7 +166,7 @@ def eliminar_evento(event_id):
         flash('Evento eliminado', 'success')
     else:
         flash(r.json().get('detail', 'No autorizado o error'), 'danger')
-    return redirect(url_for('eventos'))
+    return redirect(url_for('eventos_index'))
 
 @app.route('/logout')
 def logout():
