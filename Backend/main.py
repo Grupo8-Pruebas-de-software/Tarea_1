@@ -1,4 +1,3 @@
-
 from fastapi import FastAPI, HTTPException, Request, Body
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -6,7 +5,7 @@ import auth
 import eventos
 import entradas
 from typing import List
-from datetime import date
+from logger_config import logger
 
 
 app = FastAPI()
@@ -124,3 +123,10 @@ def entradas_por_usuario(event_id: int):
     ]
     conn.close()
     return data
+
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    logger.info(f"Request: {request.method} {request.url}")
+    response = await call_next(request)
+    logger.info(f"Response status: {response.status_code}")
+    return response
