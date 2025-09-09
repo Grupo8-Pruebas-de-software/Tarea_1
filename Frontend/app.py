@@ -168,6 +168,15 @@ def eliminar_evento(event_id):
         flash(r.json().get('detail', 'No autorizado o error'), 'danger')
     return redirect(url_for('eventos_index'))
 
+@app.route("/reportes")
+def reporte_general():
+    if 'user_id' not in session:
+        return redirect(url_for("login"))
+    r = requests.get(f'{API_URL}/reportes/resumen')
+    resumen = r.json() if r.status_code == 200 else {"total_eventos": 0, "total_cupos": 0, "eventos_agotados": 0}
+    return render_template("reporte.html", resumen=resumen)
+
+
 @app.route('/logout')
 def logout():
     session.clear()

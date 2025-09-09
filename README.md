@@ -84,11 +84,11 @@ Acceder a la web:
 - Visualizar la informacion del evento
 - Eliminar un evento en especifico
 - Ventas y devoluciones de entradas.
+- Reportes automáticos.
+- Filtrado y búsqueda de eventos.
 
 ---
 
 ## 📌 Próximos pasos
 
-- Reportes automáticos.
-- Filtrado y búsqueda de eventos.
 - Revisar añadir más cupos a un evento.

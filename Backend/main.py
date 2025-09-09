@@ -1,10 +1,10 @@
-
 from fastapi import FastAPI, HTTPException, Request, Body, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import auth
 import eventos
 import entradas
+import reportes
 from typing import List
 from logger_config import logger
 from typing import Optional, List
@@ -139,3 +139,10 @@ async def log_requests(request: Request, call_next):
     response = await call_next(request)
     logger.info(f"Response status: {response.status_code}")
     return response
+
+# Gestión de resumen
+
+@app.get("/reportes/resumen", response_model=dict)
+def get_resumen():
+    """Devuelve el resumen general de eventos y cupos"""
+    return reportes.resumen_general()
