@@ -56,8 +56,19 @@ def eventos_index():
 
     items = eventos.get_events_filtered(categoria=categoria, dias=dias, estado=estado, q=q)
     categorias = eventos.get_categories()
-    # user_id: colócalo desde tu sesión/login
-    return render_template("eventos.html", eventos=items, categorias=categorias, user_id=1)
+    user_id = session.get('user_id')
+    user_name = None
+    if user_id:
+        # Obtener el nombre del usuario desde la base de datos
+        import sqlite3, os
+        db_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "microevents.db"))
+        with sqlite3.connect(db_path) as con:
+            cur = con.cursor()
+            cur.execute("SELECT name FROM users WHERE id = ?", (user_id,))
+            row = cur.fetchone()
+            if row:
+                user_name = row[0]
+    return render_template("eventos.html", eventos=items, categorias=categorias, user_id=user_id, user_name=user_name)
 
 @app.route('/evento/<int:event_id>')
 def evento_detalle(event_id):
