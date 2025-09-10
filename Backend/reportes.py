@@ -6,11 +6,6 @@ DB_PATH = os.path.join(os.path.dirname(__file__), "..", "microevents.db")
 DB_PATH = os.path.abspath(DB_PATH)
 
 def resumen_general():
-    """Devuelve un resumen con:
-    - total_eventos: total de eventos registrados
-    - total_cupos: suma de todos los cupos disponibles
-    - eventos_agotados: cantidad de eventos con cupos = 0
-    """
     try:
         with sqlite3.connect(DB_PATH) as con:
             cur = con.cursor()
