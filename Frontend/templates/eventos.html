@@ -1,6 +1,12 @@
 {% extends 'base.html' %}
 {% block content %}
-<h1>Eventos</h1>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="mb-0">Eventos</h1>
+  {% if user_name %}
+    <span class="fw-bold">Bienvenido, {{ user_name }}!</span>
+  {% endif %}
+</div>
 
 <form method="get" class="row g-2 mb-3">
   <div class="col-md-3">

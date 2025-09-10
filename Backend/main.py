@@ -101,22 +101,18 @@ def login(user: UserLogin):
     return {"message": "Login successful", "user_id": uid}
 
 
-# Gestión de entradas: venta y devolución
 
 
 @app.post("/eventos/{event_id}/venta", response_model=dict)
 def registrar_venta(event_id: int, request: Request, user_id: int = Body(...), cantidad: int = Body(1)):
-    """Registra una venta de entrada para el evento (resta n cupos)."""
     return entradas.registrar_venta(event_id, user_id, cantidad)
 
 @app.post("/eventos/{event_id}/devolucion", response_model=dict)
 def registrar_devolucion(event_id: int, request: Request, user_id: int = Body(...), cantidad: int = Body(1)):
-    """Registra una devolución de entrada para el evento (suma n cupos)."""
     return entradas.registrar_devolucion(event_id, user_id, cantidad)
 
 @app.get("/eventos/{event_id}/entradas_usuarios", response_model=list)
 def entradas_por_usuario(event_id: int):
-    """Devuelve una lista de usuarios y la cantidad de entradas que tiene cada uno para el evento."""
     conn = entradas.sqlite3.connect('../microevents.db')
     cursor = conn.cursor()
     cursor.execute('''
@@ -140,9 +136,7 @@ async def log_requests(request: Request, call_next):
     logger.info(f"Response status: {response.status_code}")
     return response
 
-# Gestión de resumen
 
 @app.get("/reportes/resumen", response_model=dict)
 def get_resumen():
-    """Devuelve el resumen general de eventos y cupos"""
     return reportes.resumen_general()
