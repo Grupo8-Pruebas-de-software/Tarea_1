@@ -3,7 +3,43 @@
 Este proyecto implementa un sistema de gestión de microeventos con autenticación, usando **FastAPI** para el backend y **Flask** para el frontend.  
 La base de datos se gestiona con **SQLite**.
 
+
+## 🤝 Cómo contribuir
+
+¡Las contribuciones son bienvenidas! Puedes abrir issues para reportar errores o sugerir mejoras, y enviar pull requests siguiendo las buenas prácticas de desarrollo.
+
+1. Haz un fork del repositorio
+2. Crea una rama para tu feature/fix (`git checkout -b mi-feature`)
+3. Realiza tus cambios y haz commit (`git commit -am 'Agrega nueva funcionalidad'`)
+4. Haz push a tu rama (`git push origin mi-feature`)
+5. Abre un Pull Request
+
 ---
+
+
+### Texto de la Licencia MIT
+
+MIT License
+
+Copyright (c) 2025 Grupo8-Pruebas-de-software
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
 
 ## 📂 Estructura del proyecto
 ```
@@ -88,7 +124,3 @@ Acceder a la web:
 - Filtrado y búsqueda de eventos.
 
 ---
-
-## 📌 Próximos pasos
-
-- Revisar añadir más cupos a un evento.

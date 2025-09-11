@@ -134,13 +134,6 @@ def get_events_filtered(
     estado: Optional[str] = None,
     q: Optional[str] = None
 ) -> List[dict]:
-    """
-    Filtros:
-      - categoria: nombre exacto de la categoría (p.ej. 'Taller')
-      - dias: próximos N días (incluye hoy)
-      - estado: 'disponible' o 'agotado'
-      - q: keyword en name/description (LIKE)
-    """
     conn = get_db_connection()
     cur = conn.cursor()
 
@@ -154,24 +147,20 @@ def get_events_filtered(
     where = []
     params: list = []
 
-    # Categoría por nombre (opcional)
     if categoria:
         where.append("c.name = ?")
         params.append(categoria)
 
-    # Próximos N días (opcional)
     if dias and dias > 0:
         hoy = date.today()
         hasta = hoy + timedelta(days=dias)
         where.append("date(e.date) BETWEEN date(?) AND date(?)")
         params.extend([hoy.isoformat(), hasta.isoformat()])
 
-    # Estado (opcional)
     status_pred = _status_sql_predicate(estado)
     if status_pred:
         where.append(status_pred)
 
-    # Búsqueda por keyword (opcional)
     if q:
         like = f"%{q.lower()}%"
         where.append("(LOWER(e.name) LIKE ? OR LOWER(e.description) LIKE ?)")

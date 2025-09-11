@@ -1,13 +1,13 @@
 
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 import sys, os, requests
-sys.path.append(os.path.abspath("../Backend"))  # Para importar auth.py
+sys.path.append(os.path.abspath("../Backend"))
 import auth
 import eventos
 
 
 app = Flask(__name__)
-app.secret_key = "supersecret"  # Necesario para flash mensajes
+app.secret_key = "supersecret"  
 API_URL = 'http://localhost:8000'
 
 @app.route("/")
@@ -45,7 +45,6 @@ def register():
             flash("❌ Correo ya registrado", "danger")
     return render_template("register.html")
 
-# CRUD EVENTOS
 @app.route("/eventos")
 def eventos_index():
     categoria = request.args.get("categoria") or None
@@ -56,8 +55,18 @@ def eventos_index():
 
     items = eventos.get_events_filtered(categoria=categoria, dias=dias, estado=estado, q=q)
     categorias = eventos.get_categories()
-    # user_id: colócalo desde tu sesión/login
-    return render_template("eventos.html", eventos=items, categorias=categorias, user_id=1)
+    user_id = session.get('user_id')
+    user_name = None
+    if user_id:
+        import sqlite3, os
+        db_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "microevents.db"))
+        with sqlite3.connect(db_path) as con:
+            cur = con.cursor()
+            cur.execute("SELECT name FROM users WHERE id = ?", (user_id,))
+            row = cur.fetchone()
+            if row:
+                user_name = row[0]
+    return render_template("eventos.html", eventos=items, categorias=categorias, user_id=user_id, user_name=user_name)
 
 @app.route('/evento/<int:event_id>')
 def evento_detalle(event_id):
@@ -68,10 +77,8 @@ def evento_detalle(event_id):
         flash('Evento no encontrado', 'danger')
         return redirect(url_for('eventos_index'))
     evento = r.json()
-    # Obtener entradas por usuario para este evento
     r2 = requests.get(f'{API_URL}/eventos/{event_id}/entradas_usuarios')
     entradas_usuarios = r2.json() if r2.status_code == 200 else []
-    # Buscar cuántas entradas tiene el usuario actual
     user_id = session['user_id']
     entradas_usuario = 0
     for eu in entradas_usuarios:
@@ -80,7 +87,6 @@ def evento_detalle(event_id):
             break
     return render_template('evento_detalle.html', evento=evento, user_id=user_id, entradas_usuarios=entradas_usuarios, entradas_usuario=entradas_usuario)
 
-# --- Gestión de entradas ---
 @app.post('/evento/<int:event_id>/venta')
 def venta_entrada(event_id):
     if 'user_id' not in session:
