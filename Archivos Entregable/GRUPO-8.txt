@@ -1,0 +1,11 @@
+Integrantes:
+	-Felipe Campaña
+	-Luciano Yevenes
+
+
+Link repositorio:
+	-https://github.com/Grupo8-Pruebas-de-software/Tarea_1
+
+
+PD: En caso de que no funcionara la invitación al greentest nos avisa, para tratar de invitarlo de nuevo.
+Archivos de informe y plan de pruebas están en la carpeta Archivos Entregables
