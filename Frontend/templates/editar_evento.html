@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Editar Evento</h2>
+<form method="post">
+    <div class="mb-3">
+        <label>Nombre</label>
+        <input type="text" name="name" class="form-control" maxlength="100" value="{{ evento.name }}" required>
+    </div>
+    <div class="mb-3">
+        <label>Descripción</label>
+        <textarea name="description" class="form-control" required>{{ evento.description }}</textarea>
+    </div>
+    <div class="mb-3">
+        <label>Fecha</label>
+        <input type="date" name="fecha" class="form-control" value="{{ evento.date }}" required>
+    </div>
+    <div class="mb-3">
+        <label>Categoría</label>
+        <select name="categoria" class="form-control" required>
+            <option value="Charla" {% if evento.category_name == 'Charla' %}selected{% endif %}>Charla</option>
+            <option value="Taller" {% if evento.category_name == 'Taller' %}selected{% endif %}>Taller</option>
+            <option value="Show" {% if evento.category_name == 'Show' %}selected{% endif %}>Show</option>
+        </select>
+    </div>
+    <div class="mb-3">
+        <label>Precio</label>
+        <input type="number" name="precio" class="form-control" min="0" value="{{ evento.price }}" required>
+    </div>
+    <div class="mb-3">
+        <label>Cupos disponibles</label>
+        <input type="number" name="cupos" class="form-control" min="0" value="{{ evento.current_quota }}" required>
+    </div>
+    <input type="hidden" name="user_id" value="1">
+    <button type="submit" class="btn btn-success">Actualizar</button>
+    <a href="/" class="btn btn-secondary">Cancelar</a>
+</form>
+{% endblock %}

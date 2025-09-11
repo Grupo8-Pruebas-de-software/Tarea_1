@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="mb-0">Eventos</h1>
+  {% if user_name %}
+    <span class="fw-bold">Bienvenido, {{ user_name }}!</span>
+  {% endif %}
+</div>
+
+<form method="get" class="row g-2 mb-3">
+  <div class="col-md-3">
+    <label class="form-label">Categoría</label>
+    <select name="categoria" class="form-select">
+      <option value="">Todas</option>
+      {% for cat in categorias %}
+        <option value="{{ cat.name }}" {{ 'selected' if request.args.get('categoria') == cat.name else '' }}>
+          {{ cat.name }}
+        </option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div class="col-md-2">
+    <label class="form-label">Próximos</label>
+    <select name="dias" class="form-select">
+      <option value="">Cualquier fecha</option>
+      <option value="7"  {{ 'selected' if request.args.get('dias')  == '7'  else '' }}>7 días</option>
+      <option value="30" {{ 'selected' if request.args.get('dias')  == '30' else '' }}>30 días</option>
+      <option value="90" {{ 'selected' if request.args.get('dias')  == '90' else '' }}>90 días</option>
+    </select>
+  </div>
+
+  <div class="col-md-2">
+    <label class="form-label">Estado</label>
+    <select name="estado" class="form-select">
+      <option value="">Todos</option>
+      <option value="disponible" {{ 'selected' if request.args.get('estado') == 'disponible' else '' }}>Disponible</option>
+      <option value="agotado"    {{ 'selected' if request.args.get('estado') == 'agotado'    else '' }}>Agotado</option>
+    </select>
+  </div>
+
+  <div class="col-md-3">
+    <label class="form-label">Buscar</label>
+    <input type="text" name="q" value="{{ request.args.get('q','') }}" class="form-control" placeholder="Nombre o descripción">
+  </div>
+
+  <div class="col-md-2 d-flex align-items-end">
+    <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+  </div>
+</form>
+
+<a href="{{ url_for('crear_evento') }}" class="btn btn-success mb-3">Crear Evento</a>
+<a href="{{ url_for('reporte_general') }}" class="btn btn-success mb-3">Ver Reporte General</a>
+
+<table class="table table-bordered align-middle">
+  <thead>
+    <tr>
+      <th>Nombre</th>
+      <th>Fecha</th>
+      <th>Categoría</th>
+      <th>Precio</th>
+      <th>Cupos</th>
+      <th>Estado</th>
+      <th>Creador</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for evento in eventos %}
+    <tr>
+      <td>{{ evento.name }}</td>
+      <td>{{ evento.date }}</td>
+      <td>{{ evento.category_name }}</td>
+      <td>{{ evento.price }}</td>
+      <td>{{ evento.current_quota }}</td>
+      <td>
+        {% if evento.is_sold_out or evento.current_quota == 0 %}
+          <span class="badge bg-danger">Agotado</span>
+        {% else %}
+          <span class="badge bg-success">Disponible</span>
+        {% endif %}
+      </td>
+      <td>{{ evento.creator_name }}</td>
+      <td class="d-flex gap-1">
+        <a href="{{ url_for('evento_detalle', event_id=evento.id) }}" class="btn btn-info btn-sm">Ver</a>
+        {% if evento.created_by == user_id %}
+          <a href="{{ url_for('editar_evento', event_id=evento.id) }}" class="btn btn-warning btn-sm">Editar</a>
+          <form action="{{ url_for('eliminar_evento', event_id=evento.id) }}" method="post" style="display:inline;">
+            <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+          </form>
+        {% endif %}
+      </td>
+    </tr>
+  {% else %}
+    <tr><td colspan="8" class="text-center text-muted">Sin resultados</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
